@@ -1,6 +1,6 @@
 FROM phusion/baseimage:0.9.18
 
-MAINTAINER hbokh
+MAINTAINER krewie
 
 RUN apt-get update -qq && \
     apt-get install -qqy software-properties-common python-software-properties && \
