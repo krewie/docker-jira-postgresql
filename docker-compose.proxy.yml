@@ -1,0 +1,55 @@
+version: '2'
+
+volumes: {}
+
+networks:
+  backend:
+  frontend:
+
+services:
+  nginx:
+    image: jwilder/nginx-proxy
+    container_name: nginx-proxy
+    volumes:
+      - /var/run/docker.sock:/tmp/docker.sock:ro
+      - ./nginx-proxy/my_proxy.conf:/etc/nginx/conf.d/my_proxy.conf:ro
+      - ./nginx-proxy/certs/:/etc/nginx/certs
+    ports:
+      - "80:80"
+      - "443:443"
+    networks:
+      frontend:
+
+  jira_datastore:
+    image: busybox
+    volumes:
+      - /data
+    entrypoint: echo "PSQL Data"
+
+  postgresql:
+    image: paintedfox/postgresql
+    container_name: postgresql
+    environment:
+      - USER=super
+      - DB=jiradb
+      - PASS=p4ssw0rd
+    volumes_from:
+      - jira_datastore
+    networks:
+      backend:
+        aliases:
+          - db
+
+  jira:
+    image: hbokh/docker-jira-postgresql
+    container_name: jira
+    environment:
+      - VIRTUAL_HOST=jira.internal
+      - PROXY_SCHEME=https
+      - PROXY_PORT=443
+      - PROXY_SECURED=true
+    depends_on:
+      - postgresql 
+    networks:
+      backend:
+      frontend:
