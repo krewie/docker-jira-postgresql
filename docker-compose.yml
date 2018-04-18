@@ -28,7 +28,7 @@ services:
           - db
 
   jira:
-    image: hbokh/docker-jira-postgresql
+    image: krewie/docker-jira-postgresql
     container_name: jira
     ports:
       - "8080:8080"
